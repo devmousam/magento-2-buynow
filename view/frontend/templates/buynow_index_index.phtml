@@ -1,0 +1,75 @@
+<?php 
+$product = $block->getProduct(); 
+$productType = $product->getTypeId();
+$stockItem = $product->getExtensionAttributes()->getStockItem();
+$statusqty = $stockItem->getQty();
+if($product->getIsSalable()){
+//if($statusqty != 0){
+?>
+<a title="Buy Now" class="action primary" id="buy-now"><span class="buynow-text">Buy Now</span></a>
+
+<?php } ?>
+<script type="text/javascript">
+require(['jquery'], function(jquery) {
+    jquery(document).ready(function(){
+    	jquery("#buy-now").click(function(){
+    		jquery(".buynow-text").text("Redirecting...");
+    		var selectQty = jquery("#qty").val();
+    		var productType = "<?php echo $productType; ?>";
+    		var quantity = "<?php echo $product->getQty(); ?>";
+    		var ajaxCall = true;
+    		jquery("#buy-error").remove();
+
+    		if(jquery("#qty").val() == null) {
+    			jquery("#product-addtocart-button").trigger('click');
+    			ajaxCall = false;
+    			jquery(".buynow-text").text("Buy Now");
+	            return false;
+    		}
+
+
+    		var selectedOptions = {};
+            if(productType == "configurable") {
+                var datastring = jquery("#product_addtocart_form").serializeArray();
+                jquery.each( datastring, function( key, value ) {
+				  if (value.name.indexOf('super_attribute') > -1) {
+				  	  if(value.value != "") {
+					  	  var optionName = value.name;
+						  selectedOptions[optionName.substring(optionName.lastIndexOf("[") + 1,optionName.lastIndexOf("]"))] = value.value;
+					  } else {
+					  	   jquery("#product-addtocart-button").trigger('click');
+					  	   ajaxCall = false;
+					  	   jquery(".buynow-text").text("Buy Now");
+	                       return false;
+					  }
+				  }
+				});
+            }
+
+            if(ajaxCall) {
+	            jquery.ajax({
+					url: '<?php echo $this->getUrl('buynow/index/add'); ?>',
+					data: {
+					  id: '<?php echo $product->getId(); ?>',
+					  qty: selectQty,
+					  options: selectedOptions
+					},
+					type: 'POST',
+					dataType: 'json',
+					success: function(data) {
+						// console.log(data.success);
+						// return false;
+						   if(data.success == 'true') {
+						      window.location.replace("<?php echo $this->getUrl('checkout/cart'); ?>");
+						   } else {
+						   	   jquery('#buy-now').after('<p id="buy-error" style="color:red">Insufficient quantity for the selected item. Please select a lesser quantity.</p>');
+						   	   jquery(".buynow-text").text("Buy Now");
+		                       return false;
+						   }
+					}
+				});
+            }
+    	});
+    });
+});
+</script>

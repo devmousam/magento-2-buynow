@@ -1,0 +1,10 @@
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+	<body>
+		<referenceContainer name="product.info.form.content">
+			<block class="Devmousam\Buynow\Block\Index\Index" after="product.info.addtocart" name="buynow_index_index" template="Devmousam_Buynow::buynow_index_index.phtml"/>
+		</referenceContainer>
+		<referenceContainer name="product.info.options.wrapper.bottom">
+			<block class="Devmousam\Buynow\Block\Index\Index" after="product.info.addtocart.additional" name="buynow_index_index_configure" template="Devmousam_Buynow::buynow_index_index.phtml"/>
+		</referenceContainer>
+	</body>
+</page>   
